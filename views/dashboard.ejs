@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMS</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            margin: 2pxpx;
+            
+
+        }
+        html{
+            border: 10px solid black;
+            margin: 0px;
+        }
+        body{
+            margin: 0px;
+
+        }
+        .header{
+            background-color: rgb(12, 17, 70);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 20px 20px 20px rgb(8, 8, 8);
+            backdrop-filter: blur(8px);
+            
+        }
+        .header>h1{
+            font-weight: bold;
+            font-style: italic;
+            font-size: 30px;
+            text-align: left;
+            color: azure;
+            margin-right: 50px;
+            display: flex;
+            margin-right: auto;
+           
+        }
+        .header>img{
+            border-radius: 100%;
+            width: 80px;
+            margin: 13px;
+            
+        }
+        .header>a{
+            color: azure;
+            float: right;
+            display: flex;
+            padding-left: 30px;
+            padding-right: 30px;
+            font-size: 20px;
+            font-family: cursive;
+            cursor: pointer;
+            
+        }
+       
+        main{
+            background-color: darkgray;
+            padding: 10px;
+            height: 800px;
+            background-image: url("/public/images/pic1.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+
+
+        }
+        h2{
+            text-align: center;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 30px;
+            margin-top: 5%;
+           
+
+        }
+        #fetchPresenteesForm{
+            
+            display: inline-block;
+            text-align: center;
+            border: 2px solid black;
+            box-shadow: 2px 2px 2px;
+            backdrop-filter: blur(8px);
+            width: 50%;
+            margin-left: 25%;
+            margin-top: 7%;
+            padding: 50px;
+            
+
+        }
+        #presenteesResult{
+            margin-top: 5%;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header">
+            
+            <h1>Attendance Management System</h1>
+
+            <a href="/scanner">QR Scanner</a>
+            <a href="/generator">QR Generator</a>
+            <a href="/welcome">Log Out</a>
+
+        </div>
+    </header>
+    <main>
+        <% if (username) { %>
+            <h2>Welcome !!!  <%= username %> !</h2>
+        <% } else { %>
+            <h2>Welcome to the Attendance Management System.</h2>
+        <% } %>     
+        <form id="fetchPresenteesForm">
+            <label for="selectedDate">Select a Date:</label>
+            
+            <input type="date" id="selectedDate" required>
+
+            <button type="submit">Fetch Presentees</button>
+            <div id="presenteesResult"></div>
+        </form>
+
+        
+  
+    </main>
+    <script>
+        
+        document.getElementById('fetchPresenteesForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            fetchRollNumbers();
+        });
+
+        function fetchRollNumbers() {
+            const selectedDate = document.getElementById('selectedDate').value;
+            const presenteesResultDiv = document.getElementById('presenteesResult');
+
+      
+            fetch(`/getRollNumbers/${selectedDate}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    const rollNumbers = data.rollNumbers;
+                    if (rollNumbers && rollNumbers.length > 0) {
+                        const rollNumbersText = 'Presentees for ' + selectedDate + ': ' + rollNumbers.join(', ');
+                        presenteesResultDiv.innerText = rollNumbersText;
+                    } else {
+                        presenteesResultDiv.innerText = 'No presentees found for ' + selectedDate;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching presentees:', error);
+                    presenteesResultDiv.innerText = 'Error fetching presentees';
+                });
+        }
+    </script>
+    
+    
+</body>
+</html>

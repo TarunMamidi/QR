@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Page</title>
+  <style>
+    body {
+      font-family:Arial, sans-serif;
+      background-image: url("https://th.bing.com/th/id/R.7e7e0265cfcbcd3d008d5959da02c0bc?rik=76C6YV0I5LFp8g&riu=http%3a%2f%2ftrumpwallpapers.com%2fwp-content%2fuploads%2fBlack-And-White-Wallpaper-02-3840-x-2160.jpg&ehk=pNxqMkt%2b2VhRpFM6XxZEbRrjMmx6ED0O9kP2J7h1kDc%3d&risl=&pid=ImgRaw&r=0");
+      background-repeat: no-repeat;
+      background-size: cover;
+      display:flex;
+      flex-direction: column;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      margin:0;
+    }
+    .signup-box {
+      background: #fff; 
+      padding:20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      width: 300px;
+    }
+    .input-field {
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    .input-field input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .submit-btn {
+      background: #3498db;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .submit-btn:hover {
+      background: #2980b9;
+    }
+    .result-message{
+      margin-top: 20px;
+      font-weight: bold;
+      color: lime;
+    }
+    .login-link {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .login-link a {
+      color: #000000;
+      text-decoration: none;
+    }
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <form class="signup-box" method="post" action="/onSignup">
+    <h2 style="text-align: center;">Sign Up</h2>
+    <div class="input-field">
+      Name:<input type="text" name="name" placeholder="Name" autocomplete="off">
+    </div>
+    <div class="input-field">
+      Email:<input type="email" name="email" placeholder="Email" autocomplete="off">
+    </div>
+    <div class="input-field">
+      Password:<input type="password" name="password" id="password" placeholder="Password" autocomplete="new-password">
+    </div>
+    <button class="submit-btn" >Sign Up</button>
+    <div class="login-link">
+      <a href="/login">Already have an account? Click here to login</a>
+    </div>
+  </form>
+  <% if(message) { %>
+    <p class="result-message"><%= message %></p>
+  <% } %>
+</body>
+</html>

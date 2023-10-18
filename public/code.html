@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-image: url("images/pic1.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            box-shadow: #ffffff;
+            color: #ffffff; 
+            
+
+        }
+
+
+        #dashboard {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 5px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+            
+            
+            
+        }
+
+        #dashboard-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #dashboard-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #qr-code-section {
+            position: relative;
+            width: 100%;
+            max-width: 500px; 
+            height: 500px; 
+            margin-top: 20px;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%; 
+            max-width: 500px; 
+            max-height: 500px; 
+            margin: auto;
+            position: relative;
+            border-radius: 10px;
+            border: 5px solid black;
+            backdrop-filter: blur(8px);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            backdrop-filter: blur(8px);
+        }
+
+        #scanning-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: green; 
+            animation: scanning 6s infinite linear; 
+        }
+
+        @keyframes scanning {
+            0% {
+                top: 0;
+            }
+            50% {
+                top: 76%;
+            }
+            100% {
+                top: 0;
+            }
+        }
+    </style>
+    <title>QR Code Scanner</title>
+</head>
+
+<body>
+    <div id="dashboard">
+        <div id="dashboard-left">
+            <h1 style="color: #ffffff; font-family: cursive; padding-left: 260px;">QR Code Scanner</h1>
+        </div>
+        <div id="dashboard-right">
+           
+        </div>
+    </div>
+
+    <div id="qr-code-section">
+        <form action="/uploadQRCodeData" method="post" onsubmit="fetchRollNumbers(); return false;">
+            <video id="video" playsinline></video>
+            <div id="result" style="color: #ffffff;"></div>
+            <div id="scanning-line"></div>
+            
+            
+    
+        
+        </form>
+    </div>
+
+    <button onclick="location.reload()">NEXT</button>
+    
+
+
+    <script src="https://cdn.rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
+    <script>
+        const video = document.getElementById('video');
+        const rollResultDiv = document.getElementById('rollResult');
+        const resultDiv = document.getElementById('result');
+        const scanningLine = document.getElementById('scanning-line');
+        let scanning = true; 
+       
+
+        
+        const synth = window.speechSynthesis;
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then((stream) => {
+                video.srcObject = stream;
+                video.play();
+                requestAnimationFrame(tick);
+            })
+            .catch((err) => console.error(err.name, err.message));
+
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA && scanning) {
+                const canvasElement = document.createElement('canvas');
+                const canvas = canvasElement.getContext('2d');
+                canvasElement.width = video.videoWidth;
+                canvasElement.height = video.videoHeight;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                if (code) {
+                    const detectedText =  code.data;
+                    resultDiv.innerText = detectedText;
+
+                   
+                    sendQRCodeDataToServer(code.data);
+
+                    
+                    speak(detectedText);
+
+                    
+                    scanning = false;
+
+                   
+                    scanningLine.style.animation = 'none';
+                    
+                } else {
+                    resultDiv.innerText = 'Scanning for QR code...';
+                }
+            }
+
+            requestAnimationFrame(tick);
+        }
+
+        function sendQRCodeDataToServer(qrCodeData) {
+            var xhr = new XMLHttpRequest();
+            var url = '/uploadQRCodeData';
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log('QR Code data sent to the server successfully.');
+                } else if (xhr.readyState == 4) {
+                    console.error('Failed to send QR Code data to the server.');
+                }
+            };
+
+            var data = JSON.stringify({ qrCodeData: qrCodeData });
+            xhr.send(data);
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+        
+        
+
+       
+
+    </script>
+</body>
+
+</html>
+
+
